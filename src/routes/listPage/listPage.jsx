@@ -1,10 +1,17 @@
+import Filter from "../../components/filter/Filter";
+import { listData } from "../../lib/dummydata"
 import "./listPage.scss"
-import React from 'react'
 
 const ListPage = () => {
+    const data = listData;
     return (
-        <div>
-            hello from list page
+        <div className="listPage">
+            <div className="listContainer">
+                <div className="wrapper">
+                    <Filter />
+                </div>
+            </div>
+            <div className="mapContainer">map</div>
         </div>
     )
 }

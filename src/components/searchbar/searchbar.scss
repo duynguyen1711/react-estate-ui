@@ -1,4 +1,4 @@
-@import "../../responsive.scss";
+@use"../../responsive.scss";
 
 .searchBar {
     .type {
@@ -32,7 +32,7 @@
         height: 64px;
         gap: 5px;
 
-        @include sm {
+        @include responsive.sm {
             flex-direction: column;
             border: none;
         }
@@ -42,7 +42,7 @@
             width: 200px;
             padding: 0px 20px;
 
-            @include lg {
+            @include responsive.lg {
                 padding: 0px 5px;
 
                 &:nth-child(2),
@@ -51,7 +51,7 @@
                 }
             }
 
-            @include md {
+            @include responsive.md {
                 width: 200px;
 
                 &:nth-child(2),
@@ -60,7 +60,7 @@
                 }
             }
 
-            @include sm {
+            @include responsive.sm {
                 width: auto;
 
                 &:nth-child(2),
@@ -80,7 +80,7 @@
             flex: 1;
             cursor: pointer;
 
-            @include sm {
+            @include responsive.sm {
                 padding: 10px;
             }
 
