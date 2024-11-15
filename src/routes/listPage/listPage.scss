@@ -1,3 +1,5 @@
+@use "../../responsive.scss";
+
 .listPage {
     display: flex;
     height: 100%;
@@ -11,6 +13,13 @@
             display: flex;
             flex-direction: column;
             gap: 50px;
+            overflow-y: scroll;
+            padding-bottom: 50px;
+        }
+
+        .wrapper::-webkit-scrollbar {
+            display: none;
+            /* Ẩn thanh cuộn trên Webkit */
         }
     }
 
@@ -18,7 +27,12 @@
 
     .mapContainer {
         flex: 2;
+        height: 100%;
         background-color: #fcf5f3;
+
+        @include responsive.md {
+            display: none;
+        }
     }
 
 }
