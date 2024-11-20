@@ -6,6 +6,10 @@
 
     @include responsive.sm {
         flex-direction: column;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .imgContainer {
@@ -26,6 +30,11 @@
         flex-direction: column;
         justify-content: space-between;
         gap: 10px;
+
+        @include responsive.sm {
+            justify-content: center; // Đổi từ space-between sang center
+            gap: 15px; // Giảm khoảng cách giữa các phần tử
+        }
 
         img {
             width: 16px;
