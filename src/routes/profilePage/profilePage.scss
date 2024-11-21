@@ -1,0 +1,89 @@
+@use '../../responsive.scss';
+.profilePage {
+  display: flex;
+  height: 100%;
+  @include responsive.md {
+    flex-direction: column;
+    overflow-y: scroll;
+
+    &::-webkit-scrollbar {
+      display: none;
+      /* Ẩn thanh cuộn trên Webkit */
+    }
+  }
+  .details {
+    flex: 3;
+    padding-bottom: 50px;
+    overflow-y: scroll;
+    &::-webkit-scrollbar {
+      display: none;
+      /* Ẩn thanh cuộn trên Webkit */
+    }
+    @include responsive.md {
+      flex: none;
+      height: max-content;
+    }
+    .wrapper {
+      padding-right: 50px;
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+      @include responsive.md {
+        padding-right: 0px;
+      }
+      .title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        h1 {
+          font-weight: 300;
+        }
+        button {
+          padding: 12px 24px;
+          background-color: #fece51;
+          color: black;
+          border: none;
+          cursor: pointer;
+        }
+      }
+      .info {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        span {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+        }
+        img {
+          width: 40px;
+          height: 40px;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+  .chatContainer {
+    flex: 2;
+    background-color: #fcf5f3;
+    height: 100%;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+      /* Ẩn thanh cuộn trên Webkit */
+    }
+
+    @include responsive.md {
+      flex: none;
+      height: max-content;
+      margin-bottom: 50px;
+      overflow-y: scroll;
+    }
+
+    .wrapper {
+      padding: 0px 20px;
+      height: 100%;
+    }
+  }
+}
