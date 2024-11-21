@@ -1,49 +1,46 @@
-
-import HomePage from "./routes/homePage/homePage"
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import Layout from "./routes/layout/layout";
-import ListPage from "./routes/listPage/listPage";
-import SinglePage from "./routes/singlePage/singlePage";
-import Login from "./routes/login/login";
-import Register from "./routes/register/register";
+import HomePage from './routes/homePage/homePage';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Layout from './routes/layout/layout';
+import ListPage from './routes/listPage/listPage';
+import SinglePage from './routes/singlePage/singlePage';
+import Login from './routes/login/login';
+import Register from './routes/register/register';
+import ProfilePage from './routes/profilePage/ProfilePage';
 function App() {
   const router = createBrowserRouter([
     {
-      path: "/",
+      path: '/',
       element: <Layout />,
       children: [
         {
-          path: "/",
-          element: <HomePage />
+          path: '/',
+          element: <HomePage />,
         },
         {
-          path: "/list",
-          element: <ListPage />
+          path: '/list',
+          element: <ListPage />,
         },
         {
-          path: "/:id",
-          element: <SinglePage />
+          path: '/:id',
+          element: <SinglePage />,
         },
         {
-          path: "/login",
-          element: <Login />
+          path: '/login',
+          element: <Login />,
         },
         {
-          path: "/register",
-          element: < Register />
-        }
-
-      ]
-    }
+          path: '/register',
+          element: <Register />,
+        },
+        {
+          path: '/profile',
+          element: <ProfilePage />,
+        },
+      ],
+    },
   ]);
 
-  return (
-
-    <RouterProvider router={router} />
-  );
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
