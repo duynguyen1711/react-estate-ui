@@ -1,88 +1,85 @@
-@import "../../responsive.scss";
+@use '../../responsive.scss';
 
 .homePage {
-    display: flex;
-    height: 100%;
+  display: flex;
+  height: 100%;
 
-    .textContainer {
-        flex: 3;
+  .textContainer {
+    flex: 3;
 
+    .wrapper {
+      padding-right: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 50px;
+      height: 100%;
 
+      @include responsive.lg {
+        padding-right: 50px;
+      }
 
-        .wrapper {
-            padding-right: 100px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 50px;
-            height: 100%;
+      @include responsive.md {
+        padding: 0;
+      }
 
+      @include responsive.sm {
+        justify-content: flex-start;
+      }
 
-            @include lg {
-                padding-right: 50px;
-            }
+      .title {
+        font-size: 64px;
 
-            @include md {
-                padding: 0;
-            }
-
-            @include sm {
-                justify-content: flex-start;
-            }
-
-            .title {
-                font-size: 64px;
-
-                @include lg {
-                    font-size: 48px;
-                }
-            }
-
-            .boxes {
-                display: flex;
-                justify-content: space-between;
-
-                @include sm {
-                    display: none;
-                }
-
-                h1 {
-                    font-size: 36px;
-
-                    @include lg {
-                        font-size: 32px;
-                    }
-                }
-
-                h2 {
-                    font-size: 20px;
-                    font-weight: 300;
-                }
-            }
+        @include responsive.lg {
+          font-size: 48px;
         }
-    }
+      }
 
-    .imgContainer {
-        flex: 2;
-        background-color: #fcf5f3;
-        height: 100%;
-        position: relative;
+      .boxes {
         display: flex;
-        align-items: center;
+        justify-content: space-between;
 
-        @include md {
-            display: none;
+        @include responsive.sm {
+          display: none;
         }
 
-        img {
-            width: 115%;
-            position: absolute;
-            right: 0;
-            top: 0;
+        h1 {
+          font-size: 36px;
 
-            @include lg {
-                width: 105%;
-            }
+          @include responsive.lg {
+            font-size: 32px;
+          }
         }
+
+        h2 {
+          font-size: 20px;
+          font-weight: 300;
+        }
+      }
     }
+  }
+
+  .imgContainer {
+    flex: 2;
+    background-color: #fcf5f3;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    @include responsive.md {
+      display: none;
+    }
+
+    img {
+      width: 115%;
+      position: absolute;
+      right: 0;
+      top: 0;
+
+      @include responsive.lg {
+        width: 105%;
+      }
+    }
+  }
 }
