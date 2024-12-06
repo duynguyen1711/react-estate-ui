@@ -58,16 +58,26 @@ nav {
     @include responsive.md {
       background-color: transparent;
     }
+    a {
+      padding: 12px 24px;
+      margin: 20px;
+    }
     .user {
       display: flex;
       align-items: center;
       font-weight: bold;
       img {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         object-fit: cover;
         margin-right: 20px;
+        @include responsive.md {
+          display: none;
+        }
+        @include responsive.sm {
+          display: block;
+        }
       }
       span {
         @include responsive.sm {
@@ -94,13 +104,12 @@ nav {
       }
     }
 
-    a {
-      padding: 12px 24px;
-      margin: 20px;
-    }
-
     .register {
       background-color: #fece51;
+      height: 50%;
+      @include responsive.sm {
+        display: none;
+      }
     }
 
     .menuIcon {
