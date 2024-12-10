@@ -45,11 +45,11 @@ function App() {
           element: <ProfilePage />,
         },
         {
-          path: '/test',
+          path: '/profile/create-post',
           element: <NewPostPage />,
         },
         {
-          path: '/testupdate',
+          path: '/profile/update',
           element: <ProfileUpdatePage />,
         },
       ],
