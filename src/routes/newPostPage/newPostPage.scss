@@ -77,12 +77,38 @@
     @include responsive.md {
       display: none;
     }
+    .imgZone {
+      display: flex;
+      flex-wrap: wrap; /* Allows wrapping of items to the next row */
+      gap: 16px; /* Space between images */
+      width: 100%;
+      justify-content: center;
+      img {
+        width: 30%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 5px;
+      }
+    }
 
-    img {
-      width: 50%;
-      height: 180px;
-      object-fit: cover;
+    button {
+      width: 120px; /* Kích thước nút upload */
+      height: 40px;
+      font-size: 14px;
+      background-color: #007bff;
+      color: white;
+      border: none;
       border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
     }
   }
 }

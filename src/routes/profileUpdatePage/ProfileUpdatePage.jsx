@@ -3,13 +3,13 @@ import './profileUpdatePage.scss';
 import { AuthContext } from '../../context/AuthContext';
 import apiRequest from '../../lib/apiRequest';
 import { useNavigate } from 'react-router-dom';
-import UploadWidget from '../../components/uploadWiget/UploadWiget';
+import CloudinaryUploadWidget from '../../components/uploadWiget/CloudiaryUploadWidget';
 
 function ProfileUpdatePage() {
   const { currentUser, updateUser } = useContext(AuthContext);
   const [error, setError] = useState('');
-  const [avatar, setAvatar] = useState(currentUser.avatar);
-  const [publicId, setPublicId] = useState('');
+  const [avatar, setAvatar] = useState([]);
+
   const uwConfig = {
     cloudName: 'duy1711',
     uploadPreset: 'estate',
@@ -18,6 +18,7 @@ function ProfileUpdatePage() {
     folder: 'avatars',
   };
   const navigate = useNavigate();
+
   const handleUpdate = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -27,14 +28,15 @@ function ProfileUpdatePage() {
         username,
         password,
         email,
-        avatar: avatar,
+        avatar: avatar[0],
       });
       updateUser(res.data);
       navigate('/profile');
     } catch (e) {
-      setError(e.response.data?.message);
+      setError(e.response.data?.message || 'Something went wrong');
     }
   };
+
   return (
     <div className='profileUpdatePage'>
       <div className='formContainer'>
@@ -67,12 +69,12 @@ function ProfileUpdatePage() {
         </form>
       </div>
       <div className='sideContainer'>
-        <img src={avatar || '/noavatar.png'} alt='' className='avatar' />
-        <UploadWidget
-          uwConfig={uwConfig}
-          setPublicId={setPublicId}
-          setAvatar={setAvatar}
+        <img
+          src={avatar[0] || currentUser.avatar || '/noavatar.jpg'}
+          alt=''
+          className='avatar'
         />
+        <CloudinaryUploadWidget uwConfig={uwConfig} setAvatar={setAvatar} />
       </div>
     </div>
   );

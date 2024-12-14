@@ -1,6 +1,22 @@
+import { useState } from 'react';
+import CloudinaryUploadWidget from '../../components/uploadWiget/CloudiaryUploadWidget';
 import './newPostPage.scss';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const NewPostPage = () => {
+  const uwConfig = {
+    cloudName: 'duy1711',
+    uploadPreset: 'estate',
+    multiple: true,
+    maxImageFileSize: 2000000,
+    folder: 'posts',
+  };
+  const [value, setValue] = useState('');
+  const [images, setImages] = useState([]);
+  const [error, setError] = useState('');
+  const handleCreate = () => {};
+
   return (
     <div className='newPostPage'>
       <div className='formContainer'>
@@ -100,12 +116,20 @@ const NewPostPage = () => {
               <label htmlFor='restaurant'>Restaurant</label>
               <input min={0} id='restaurant' name='restaurant' type='number' />
             </div>
-            <button className='sendButton'>Add</button>
+            <button className='sendButton' onClick={handleCreate}>
+              Add
+            </button>
           </form>
         </div>
       </div>
       <div className='sideContainer'>
-        <img src='https://www.cea.gov.sg/images/default-source/default-album/ceanergy_estate-agency-agreements_fa_780.jpg' />
+        <div className='imgZone'>
+          {images.map((image, index) => (
+            <img src={image} key={index} alt='' />
+          ))}
+        </div>
+
+        <CloudinaryUploadWidget uwConfig={uwConfig} setAvatar={setImages} />
       </div>
     </div>
   );
