@@ -4,10 +4,10 @@ function CloudinaryUploadWidget({ uwConfig, setAvatar }) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    // Check if the script is already loaded
+    // Kiểm tra nếu script đã tồn tại
     const scriptExists = document.getElementById('uw');
     if (!scriptExists) {
-      // If script is not loaded, create and load the script
+      // Nếu script chưa tồn tại, tạo và thêm vào
       const script = document.createElement('script');
       script.setAttribute('async', '');
       script.setAttribute('id', 'uw');
@@ -15,34 +15,43 @@ function CloudinaryUploadWidget({ uwConfig, setAvatar }) {
       script.onload = () => setLoaded(true);
       document.body.appendChild(script);
     } else {
-      // If already loaded, just set loaded to true
+      // Nếu script đã tồn tại, set loaded là true
       setLoaded(true);
     }
   }, []);
 
   useEffect(() => {
+    let myWidget;
+
     if (loaded) {
-      // Initialize Cloudinary upload widget when script is loaded
-      const myWidget = window.cloudinary.createUploadWidget(
+      // Khởi tạo widget khi script đã tải
+      myWidget = window.cloudinary.createUploadWidget(
         uwConfig,
         (error, result) => {
           if (!error && result && result.event === 'success') {
             const newImage = result.info.secure_url;
 
-            // Check if the image already exists in the state to prevent duplicates
+            // Kiểm tra trùng lặp và thêm ảnh mới vào state
             setAvatar((prevImages) => {
               if (!prevImages.includes(newImage)) {
-                return [...prevImages, newImage]; // Add image if it's not already in the array
+                return [...prevImages, newImage];
               }
-              return prevImages; // Do nothing if the image is already in the array
+              return prevImages;
             });
           }
         }
       );
 
-      document.getElementById('upload_widget').addEventListener('click', () => {
-        myWidget.open(); // Open the widget when button is clicked
-      });
+      const uploadButton = document.getElementById('upload_widget');
+
+      // Gắn sự kiện vào nút
+      const handleClick = () => myWidget.open();
+      uploadButton.addEventListener('click', handleClick);
+
+      // Cleanup để loại bỏ sự kiện khi component unmount hoặc re-render
+      return () => {
+        uploadButton.removeEventListener('click', handleClick);
+      };
     }
   }, [loaded, uwConfig, setAvatar]);
 

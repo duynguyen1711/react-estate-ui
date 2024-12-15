@@ -55,12 +55,16 @@
         }
         .sendButton {
           width: 30%;
+          line-height: 48px;
           border-radius: 5px;
           border: none;
           background-color: teal;
           color: white;
           font-weight: bold;
           cursor: pointer;
+        }
+        span {
+          color: red;
         }
       }
     }
