@@ -4,8 +4,10 @@ import './pin.scss';
 import { Link } from 'react-router-dom';
 
 const Pin = ({ item, isListPage }) => {
+  const lat = parseFloat(item.latitude);
+  const lng = parseFloat(item.longitude);
   return (
-    <Marker position={[item.latitude, item.longitude]}>
+    <Marker position={[lat, lng]}>
       <Popup>
         <div className='popupContainer'>
           {isListPage && <img src={item.img} alt='' />}

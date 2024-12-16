@@ -3,12 +3,13 @@ import List from '../../components/list/List';
 import './profilePage.scss';
 import apiRequest from '../../lib/apiRequest';
 import { Link, useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 
 const ProfilePage = () => {
   const { currentUser, updateUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
   const handleLogout = async () => {
     try {
       await apiRequest.post('/Auth/logout');
@@ -18,6 +19,19 @@ const ProfilePage = () => {
       console.log(err);
     }
   };
+  const getDataPostOfUser = async () => {
+    try {
+      const res = await apiRequest.get('/posts/post-of-user');
+      setPosts(res.data); // Lưu dữ liệu bài viết vào state
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+    }
+  };
+  useEffect(() => {
+    if (currentUser) {
+      getDataPostOfUser(); // Lấy bài viết khi có currentUser
+    }
+  }, [currentUser]);
   return (
     <div className='profilePage'>
       <div className='details'>
@@ -47,11 +61,11 @@ const ProfilePage = () => {
               <button>Create New Post</button>
             </Link>
           </div>
-          <List />
+          <List data={posts} />
           <div className='title'>
             <h1>Saved List</h1>
           </div>
-          <List />
+          <List data />
         </div>
       </div>
       <div className='chatContainer'>
