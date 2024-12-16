@@ -1,33 +1,66 @@
-import { useLoaderData } from 'react-router-dom';
+import { Await, useLoaderData } from 'react-router-dom';
 import Card from '../../components/card/Card';
 import Filter from '../../components/filter/Filter';
 import List from '../../components/list/List';
 import Map from '../../components/map/Map';
-import { listData } from '../../lib/dummydata';
 import './listPage.scss';
+import { Suspense } from 'react';
 
 const ListPage = () => {
-  const rawData = useLoaderData();
+  const postRespone = useLoaderData();
 
   // Parse latitude and longitude
-  const data = rawData.map((item) => ({
-    ...item,
-    latitude: parseFloat(item.latitude) || 0,
-    longitude: parseFloat(item.longitude) || 0,
-  }));
-  console.log(data);
+
   return (
     <div className='listPage'>
       <div className='listContainer'>
         <div className='wrapper'>
           <Filter />
-          {data.map((item) => (
-            <Card key={item.id} item={item} />
-          ))}
+          <Suspense fallback={<div>Loading...</div>}>
+            <Await
+              resolve={postRespone}
+              errorElement={<div>Could not load posts 😬</div>}
+            >
+              {(resolvedData) => {
+                const data = Array.isArray(resolvedData.postRespone)
+                  ? resolvedData.postRespone.map((item) => ({
+                      ...item,
+                      latitude: parseFloat(item.latitude) || 0,
+                      longitude: parseFloat(item.longitude) || 0,
+                    }))
+                  : [];
+                return data.length > 0 ? (
+                  <List data={data} />
+                ) : (
+                  <p>No data available</p>
+                );
+              }}
+            </Await>
+          </Suspense>
         </div>
       </div>
       <div className='mapContainer'>
-        <Map items={data} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Await
+            resolve={postRespone}
+            errorElement={<div>Could not load posts 😬</div>}
+          >
+            {(resolvedData) => {
+              const data = Array.isArray(resolvedData.postRespone)
+                ? resolvedData.postRespone.map((item) => ({
+                    ...item,
+                    latitude: parseFloat(item.latitude) || 0,
+                    longitude: parseFloat(item.longitude) || 0,
+                  }))
+                : [];
+              return data.length > 0 ? (
+                <Map items={data} />
+              ) : (
+                <p>No data available</p>
+              );
+            }}
+          </Await>
+        </Suspense>
       </div>
     </div>
   );

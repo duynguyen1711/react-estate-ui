@@ -8,7 +8,11 @@ import Register from './routes/register/register';
 import ProfilePage from './routes/profilePage/ProfilePage';
 import NewPostPage from './routes/newPostPage/NewPostPage';
 import ProfileUpdatePage from './routes/profileUpdatePage/ProfileUpdatePage';
-import { ListPostLoader, singlePostLoader } from './lib/loader';
+import {
+  ListMyOwnPostLoader,
+  ListPostLoader,
+  singlePostLoader,
+} from './lib/loader';
 function App() {
   const router = createBrowserRouter([
     {
@@ -46,6 +50,7 @@ function App() {
         {
           path: '/profile',
           element: <ProfilePage />,
+          loader: ListMyOwnPostLoader,
         },
         {
           path: '/profile/create-post',
