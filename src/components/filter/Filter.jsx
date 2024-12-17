@@ -66,10 +66,10 @@ const Filter = () => {
             onChange={handleChange}
           >
             <option value=''>any</option>
-            <option value='apartment'>Apartment</option>
-            <option value='house'>House</option>
-            <option value='condo'>Condo</option>
-            <option value='land'>Land</option>
+            <option value='0'>Apartment</option>
+            <option value='1'>House</option>
+            <option value='2'>Condo</option>
+            <option value='3'>Land</option>
           </select>
         </div>
         <div className='item'>

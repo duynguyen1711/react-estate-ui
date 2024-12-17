@@ -3,7 +3,7 @@ import Filter from '../../components/filter/Filter';
 import List from '../../components/list/List';
 import Map from '../../components/map/Map';
 import './listPage.scss';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 
 const ListPage = () => {
   const { postResponse } = useLoaderData(); // Lấy postResponse từ loader

@@ -2,25 +2,23 @@ import './map.scss';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import Pin from '../pin/Pin';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 const Map = ({ items, isListPage }) => {
-  const mapRef = useRef();
+  const mapRef = useRef(null);
+  console.log(items);
 
-  useEffect(() => {
-    return () => {
-      // Clean up the map container when the component unmounts or before rerendering
-      if (mapRef.current) {
-        mapRef.current.leafletElement.remove();
-      }
-    };
-  }, []);
+  // Reset map when items change
+  const mapKey = Math.random();
+  console.log(mapKey);
+
   return (
     <MapContainer
-      ref={mapRef}
       center={
         items.length > 0 ? [items[0].latitude, items[0].longitude] : [0, 0]
       }
+      ref={mapRef} // Reference for map
+      key={mapKey}
       zoom={7}
       scrollWheelZoom={true}
       className='map'
