@@ -2,10 +2,22 @@ import './map.scss';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import Pin from '../pin/Pin';
+import { useEffect, useRef } from 'react';
 
 const Map = ({ items, isListPage }) => {
+  const mapRef = useRef();
+
+  useEffect(() => {
+    return () => {
+      // Clean up the map container when the component unmounts or before rerendering
+      if (mapRef.current) {
+        mapRef.current.leafletElement.remove();
+      }
+    };
+  }, []);
   return (
     <MapContainer
+      ref={mapRef}
       center={
         items.length > 0 ? [items[0].latitude, items[0].longitude] : [0, 0]
       }

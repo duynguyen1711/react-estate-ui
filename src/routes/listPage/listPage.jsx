@@ -1,5 +1,4 @@
 import { Await, useLoaderData } from 'react-router-dom';
-import Card from '../../components/card/Card';
 import Filter from '../../components/filter/Filter';
 import List from '../../components/list/List';
 import Map from '../../components/map/Map';
@@ -7,23 +6,21 @@ import './listPage.scss';
 import { Suspense } from 'react';
 
 const ListPage = () => {
-  const postRespone = useLoaderData();
-
-  // Parse latitude and longitude
-
+  const { postResponse } = useLoaderData(); // Lấy postResponse từ loader
   return (
     <div className='listPage'>
       <div className='listContainer'>
         <div className='wrapper'>
           <Filter />
-          <Suspense fallback={<div>Loading...</div>}>
+
+          <Suspense fallback={<p>🌀 Loading posts...</p>}>
             <Await
-              resolve={postRespone}
+              resolve={postResponse} // Dữ liệu trả về từ loader
               errorElement={<div>Could not load posts 😬</div>}
             >
               {(resolvedData) => {
-                const data = Array.isArray(resolvedData.postRespone)
-                  ? resolvedData.postRespone.map((item) => ({
+                const data = Array.isArray(resolvedData.data)
+                  ? resolvedData.data.map((item) => ({
                       ...item,
                       latitude: parseFloat(item.latitude) || 0,
                       longitude: parseFloat(item.longitude) || 0,
@@ -39,15 +36,16 @@ const ListPage = () => {
           </Suspense>
         </div>
       </div>
+
       <div className='mapContainer'>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>🗺️ Loading map...</div>}>
           <Await
-            resolve={postRespone}
-            errorElement={<div>Could not load posts 😬</div>}
+            resolve={postResponse}
+            errorElement={<div>Could not load map 😬</div>}
           >
             {(resolvedData) => {
-              const data = Array.isArray(resolvedData.postRespone)
-                ? resolvedData.postRespone.map((item) => ({
+              const data = Array.isArray(resolvedData.data)
+                ? resolvedData.data.map((item) => ({
                     ...item,
                     latitude: parseFloat(item.latitude) || 0,
                     longitude: parseFloat(item.longitude) || 0,

@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import './card.scss';
 const Card = ({ item }) => {
   const hasImages = item.images && item.images.length > 0;
-  console.log(item);
   return (
     <div className='card'>
       <Link to={`/${item.id}`} className='imgContainer'>

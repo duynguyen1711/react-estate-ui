@@ -2,14 +2,14 @@ import Chat from '../../components/chat/Chat';
 import List from '../../components/list/List';
 import './profilePage.scss';
 import apiRequest from '../../lib/apiRequest';
-import { Link, useLoaderData, useNavigate } from 'react-router-dom';
-import { useContext, useEffect, useState } from 'react';
+import { Await, Link, useLoaderData, useNavigate } from 'react-router-dom';
+import { Suspense, useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 
 const ProfilePage = () => {
   const { currentUser, updateUser } = useContext(AuthContext);
   const navigate = useNavigate();
-  const posts = useLoaderData();
+  const { postResponse } = useLoaderData();
   const handleLogout = async () => {
     try {
       await apiRequest.post('/Auth/logout');
@@ -49,7 +49,29 @@ const ProfilePage = () => {
               <button>Create New Post</button>
             </Link>
           </div>
-          <List data={posts} />
+          <Suspense fallback={<p>Loading...</p>}>
+            <Await
+              resolve={postResponse}
+              errorElement={<div>Could not load posts 😬</div>}
+            >
+              {(resolvedData) => {
+                console.log(resolvedData);
+                const data = Array.isArray(resolvedData.data)
+                  ? resolvedData.data.map((item) => ({
+                      ...item,
+                      latitude: parseFloat(item.latitude) || 0,
+                      longitude: parseFloat(item.longitude) || 0,
+                    }))
+                  : [];
+                return data.length > 0 ? (
+                  <List data={data} />
+                ) : (
+                  <p>No data available</p>
+                );
+              }}
+            </Await>
+          </Suspense>
+
           <div className='title'>
             <h1>Saved List</h1>
           </div>
