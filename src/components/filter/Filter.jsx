@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import './filter.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const Filter = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -12,18 +12,54 @@ const Filter = () => {
     maxPrice: searchParams.get('maxPrice') || '',
     bedroom: searchParams.get('bedroom') || '',
   });
-  const handleChange = (e) => {
-    setQuery({
-      ...query,
-      [e.target.name]: e.target.value,
-    });
+  const [errors, setErrors] = useState({
+    minPrice: '',
+    maxPrice: '',
+    bedroom: '',
+  });
+
+  const validateNegative = (name, value) => {
+    return value !== '' && parseInt(value) < 0
+      ? 'Value cannot be negative'
+      : '';
   };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    let errorMessage = '';
+
+    // Reusable negative validation for minPrice, maxPrice, and bedroom
+    if (name === 'minPrice' || name === 'maxPrice' || name === 'bedroom') {
+      errorMessage = validateNegative(name, value);
+    }
+
+    // Update query state and errors
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      [name]: value,
+    }));
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: errorMessage,
+    }));
+  };
+
   const handleFilter = () => {
     const params = Object.fromEntries(
       Object.entries(query).filter(([_, value]) => value.trim() !== '')
     );
     setSearchParams(params);
   };
+
+  const validateForm = () => {
+    // Ensure that there are no errors before submitting
+    return !Object.values(errors).some((error) => error !== '');
+  };
+
+  useEffect(() => {
+    console.log(query);
+  }, [query]);
 
   return (
     <div className='filter'>
@@ -105,9 +141,14 @@ const Filter = () => {
             defaultValue={query.bedroom}
           />
         </div>
-        <button onClick={handleFilter}>
+        <button onClick={handleFilter} disabled={!validateForm()}>
           <img src='/search.png' alt='' />
         </button>
+      </div>
+      <div className='error' style={{ color: 'red' }}>
+        {(errors.minPrice || errors.maxPrice || errors.bedroom) && (
+          <span className='error'>Value cannot be negative</span>
+        )}
       </div>
     </div>
   );
