@@ -49,18 +49,20 @@ const Slider = ({ images }) => {
         </div>
       )}
 
-      <div className='bigImage'>
+      <div className='bigImage' style={{ flex: images.length === 1 ? 1 : 3 }}>
         <img src={images[0]} onClick={() => setImageIndex(0)} />
       </div>
-      <div className='smallImages'>
-        {images.slice(1).map((image, index) => (
-          <img
-            src={image}
-            key={index}
-            onClick={() => setImageIndex(index + 1)}
-          />
-        ))}
-      </div>
+      {images.length > 1 && (
+        <div className='smallImages' style={{ flex: 1 }}>
+          {images.slice(1).map((image, index) => (
+            <img
+              src={image}
+              key={index}
+              onClick={() => setImageIndex(index + 1)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
