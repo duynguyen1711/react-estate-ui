@@ -1,111 +1,112 @@
-@use "../../responsive.scss";
+@use '../../responsive.scss';
 
 .card {
+  display: flex;
+  gap: 20px;
+
+  @include responsive.sm {
+    flex-direction: column;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .imgContainer {
+    flex: 2;
+    height: 200px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+  }
+
+  .textContainer {
+    flex: 3;
     display: flex;
-    gap: 20px;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
 
     @include responsive.sm {
-        flex-direction: column;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        border-radius: 20px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      justify-content: center; // Đổi từ space-between sang center
+      gap: 15px; // Giảm khoảng cách giữa các phần tử
     }
 
-    .imgContainer {
-        flex: 2;
-        height: 200px;
-
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-        }
+    img {
+      width: 16px;
+      height: 16px;
     }
 
-    .textContainer {
-        flex: 3;
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #444;
+      transition: all 0.4s ease;
+
+      &:hover {
+        color: #000;
+        scale: 1.01;
+      }
+    }
+
+    .address {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #888;
+    }
+
+    .price {
+      font-size: 20px;
+      font-weight: 300;
+      padding: 5px;
+      border-radius: 5px;
+      background-color: rgba(254, 205, 81, 0.438);
+      width: max-content;
+    }
+
+    .bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+
+      .features {
         display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        gap: 10px;
+        gap: 20px;
+        font-size: 14px;
 
-        @include responsive.sm {
-            justify-content: center; // Đổi từ space-between sang center
-            gap: 15px; // Giảm khoảng cách giữa các phần tử
+        .feature {
+          border: 1px solid #999;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          padding: 5px;
+          border-radius: 5px;
+          background-color: whitesmoke;
         }
+      }
 
-        img {
-            width: 16px;
-            height: 16px;
-        }
+      .icons {
+        display: flex;
+        gap: 20px;
 
-        .title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #444;
-            transition: all 0.4s ease;
-
-            &:hover {
-                color: #000;
-                scale: 1.01;
-            }
-        }
-
-        .address {
-            font-size: 14px;
+        .icon {
+          button {
+            border-radius: 5px;
+            border: 1px solid #999;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 5px;
-            color: #888;
-        }
-
-        .price {
-            font-size: 20px;
-            font-weight: 300;
+            justify-content: center;
             padding: 5px;
-            border-radius: 5px;
-            background-color: rgba(254, 205, 81, 0.438);
-            width: max-content;
+          }
         }
-
-        .bottom {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-
-            .features {
-                display: flex;
-                gap: 20px;
-                font-size: 14px;
-
-                .feature {
-                    border: 1px solid #999;
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                    padding: 5px;
-                    border-radius: 5px;
-                    background-color: whitesmoke;
-                }
-            }
-
-            .icons {
-                display: flex;
-                gap: 20px;
-
-                .icon {
-                    border-radius: 5px;
-                    border: 1px solid #999;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 5px;
-                }
-            }
-
-        }
+      }
     }
+  }
 }
