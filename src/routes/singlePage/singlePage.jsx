@@ -3,10 +3,63 @@ import Map from '../../components/map/Map';
 import './singlePage.scss';
 import DOMPurify from 'dompurify';
 
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
+import { useContext, useState, useEffect } from 'react';
+import apiRequest from '../../lib/apiRequest';
 
 const SinglePage = () => {
   const singlePostData = useLoaderData();
+  const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const [saved, setSaved] = useState(false);
+
+  // Kiểm tra trạng thái bài đăng đã được lưu
+  const checkSavedStatus = async () => {
+    if (currentUser) {
+      try {
+        const response = await apiRequest.get(
+          `/saved-posts/is-saved?postId=${singlePostData.id}&userId=${currentUser.id}`
+        );
+        setSaved(response.data.isSaved);
+      } catch (err) {
+        console.log('Error checking saved status', err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    checkSavedStatus(); // Gọi checkSavedStatus khi component được mount
+  }, [currentUser, singlePostData.id]);
+
+  // Xử lý sự kiện lưu bài đăng
+  const handleSave = async () => {
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      // Thực hiện lưu bài đăng nếu chưa lưu
+      if (!saved) {
+        await apiRequest.post('/saved-posts', {
+          userId: currentUser.id,
+          postId: singlePostData.id,
+        });
+        setSaved((prev) => !prev);
+      } else {
+        // Xóa bài đăng khỏi danh sách đã lưu nếu đã lưu
+        await apiRequest.delete(`/saved-posts/${singlePostData.id}`, {
+          data: { userId: currentUser.id },
+        });
+        setSaved((prev) => !prev);
+      }
+    } catch (err) {
+      console.log('Error saving post', err);
+    }
+  };
+
   return (
     <div className='singlePage'>
       <div className='details'>
@@ -149,9 +202,14 @@ const SinglePage = () => {
               <img src='/chat.png' alt='' />
               Send a Message
             </button>
-            <button>
+            <button
+              onClick={handleSave}
+              style={{
+                backgroundColor: saved ? '#fece51' : 'white',
+              }}
+            >
               <img src='/save.png' alt='' />
-              Save the Place
+              {saved ? 'Place Saved' : 'Save the Place'}
             </button>
           </div>
         </div>

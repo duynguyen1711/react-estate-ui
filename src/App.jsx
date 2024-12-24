@@ -11,7 +11,9 @@ import ProfileUpdatePage from './routes/profileUpdatePage/ProfileUpdatePage';
 import {
   ListMyOwnPostLoader,
   ListPostLoader,
+  ListPostSaved,
   singlePostLoader,
+  CombinedPostLoader,
 } from './lib/loader';
 function App() {
   const router = createBrowserRouter([
@@ -50,7 +52,7 @@ function App() {
         {
           path: '/profile',
           element: <ProfilePage />,
-          loader: ListMyOwnPostLoader,
+          loader: CombinedPostLoader,
         },
         {
           path: '/profile/create-post',

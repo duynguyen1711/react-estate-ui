@@ -9,7 +9,8 @@ import { AuthContext } from '../../context/AuthContext';
 const ProfilePage = () => {
   const { currentUser, updateUser } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { postResponse } = useLoaderData();
+  const { postResponse, postSavedResponse } = useLoaderData();
+  console.log(postSavedResponse);
   const handleLogout = async () => {
     try {
       await apiRequest.post('/Auth/logout');
@@ -75,7 +76,28 @@ const ProfilePage = () => {
           <div className='title'>
             <h1>Saved List</h1>
           </div>
-          <List data />
+          <Suspense fallback={<p>Loading...</p>}>
+            <Await
+              resolve={postSavedResponse}
+              errorElement={<div>Could not load posts 😬</div>}
+            >
+              {(resolvedData) => {
+                console.log(resolvedData);
+                const data = Array.isArray(resolvedData.data)
+                  ? resolvedData.data.map((item) => ({
+                      ...item,
+                      latitude: parseFloat(item.latitude) || 0,
+                      longitude: parseFloat(item.longitude) || 0,
+                    }))
+                  : [];
+                return data.length > 0 ? (
+                  <List data={data} />
+                ) : (
+                  <p>No data available</p>
+                );
+              }}
+            </Await>
+          </Suspense>
         </div>
       </div>
       <div className='chatContainer'>
