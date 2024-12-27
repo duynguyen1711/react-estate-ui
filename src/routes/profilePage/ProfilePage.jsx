@@ -9,8 +9,7 @@ import { AuthContext } from '../../context/AuthContext';
 const ProfilePage = () => {
   const { currentUser, updateUser } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { postResponse, postSavedResponse } = useLoaderData();
-  console.log(postSavedResponse);
+  const { postResponse, postSavedResponse, chatResponse } = useLoaderData();
   const handleLogout = async () => {
     try {
       await apiRequest.post('/Auth/logout');
@@ -102,7 +101,21 @@ const ProfilePage = () => {
       </div>
       <div className='chatContainer'>
         <div className='wrapper'>
-          <Chat />
+          <Suspense fallback={<p>Loading...</p>}>
+            <Await
+              resolve={chatResponse}
+              errorElement={<div>Could not load chats 😬</div>}
+            >
+              {(resolvedData) => {
+                console.log(resolvedData.data);
+                return resolvedData.data.length > 0 ? (
+                  <Chat item={resolvedData.data} />
+                ) : (
+                  <p>No data available</p>
+                );
+              }}
+            </Await>
+          </Suspense>
         </div>
       </div>
     </div>

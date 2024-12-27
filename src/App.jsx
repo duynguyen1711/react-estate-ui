@@ -8,13 +8,7 @@ import Register from './routes/register/register';
 import ProfilePage from './routes/profilePage/ProfilePage';
 import NewPostPage from './routes/newPostPage/NewPostPage';
 import ProfileUpdatePage from './routes/profileUpdatePage/ProfileUpdatePage';
-import {
-  ListMyOwnPostLoader,
-  ListPostLoader,
-  ListPostSaved,
-  singlePostLoader,
-  CombinedPostLoader,
-} from './lib/loader';
+import { ListPostLoader, singlePostLoader, ProfileLoader } from './lib/loader';
 function App() {
   const router = createBrowserRouter([
     {
@@ -52,7 +46,12 @@ function App() {
         {
           path: '/profile',
           element: <ProfilePage />,
-          loader: CombinedPostLoader,
+          // loader: ProfileLoader,
+          loader: async () => {
+            const { postResponse, postSavedResponse, chatResponse } =
+              await ProfileLoader(); // Gọi loader lấy dữ liệu chat
+            return { postResponse, postSavedResponse, chatResponse };
+          },
         },
         {
           path: '/profile/create-post',
