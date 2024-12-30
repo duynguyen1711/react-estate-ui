@@ -10,6 +10,22 @@ const ProfilePage = () => {
   const { currentUser, updateUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const { postResponse, postSavedResponse, chatResponse } = useLoaderData();
+  console.log(chatResponse);
+  const [chatList, setChatList] = useState([]);
+  // Hàm gọi lại API để cập nhật danh sách chat
+  const refreshChatList = async () => {
+    try {
+      const res = await apiRequest.get('/chats');
+      setChatList(res.data);
+    } catch (err) {
+      console.error('Error refreshing chat list:', err);
+    }
+  };
+
+  // Khởi tạo danh sách chat từ `chatResponse`
+  useEffect(() => {
+    chatResponse.then((data) => setChatList(data.data));
+  }, [chatResponse]);
   const handleLogout = async () => {
     try {
       await apiRequest.post('/Auth/logout');
@@ -55,7 +71,6 @@ const ProfilePage = () => {
               errorElement={<div>Could not load posts 😬</div>}
             >
               {(resolvedData) => {
-                console.log(resolvedData);
                 const data = Array.isArray(resolvedData.data)
                   ? resolvedData.data.map((item) => ({
                       ...item,
@@ -81,7 +96,6 @@ const ProfilePage = () => {
               errorElement={<div>Could not load posts 😬</div>}
             >
               {(resolvedData) => {
-                console.log(resolvedData);
                 const data = Array.isArray(resolvedData.data)
                   ? resolvedData.data.map((item) => ({
                       ...item,
@@ -107,9 +121,11 @@ const ProfilePage = () => {
               errorElement={<div>Could not load chats 😬</div>}
             >
               {(resolvedData) => {
-                console.log(resolvedData.data);
+                if (chatList.length === 0) {
+                  setChatList(resolvedData.data);
+                }
                 return resolvedData.data.length > 0 ? (
-                  <Chat item={resolvedData.data} />
+                  <Chat item={chatList} refreshChatList={refreshChatList} />
                 ) : (
                   <p>No data available</p>
                 );

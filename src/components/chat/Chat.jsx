@@ -1,17 +1,21 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import './chat.scss';
 import apiRequest from '../../lib/apiRequest';
 import { AuthContext } from '../../context/AuthContext';
+import { format } from 'timeago.js';
 
-const Chat = ({ item }) => {
-  console.log(item);
+const Chat = ({ item, refreshChatList }) => {
   const { currentUser } = useContext(AuthContext);
   const [chat, setChat] = useState(null);
   const handleOpen = async (id) => {
     try {
       const res = await apiRequest.get(`/chats/${id}`);
       setChat(res.data);
-      console.log(res.data.id);
+      const test = await apiRequest.put(`/chats/read/${id}`);
+      console.log(test);
+      if (refreshChatList) {
+        refreshChatList();
+      }
     } catch (err) {
       console.log(err);
     }
@@ -21,15 +25,26 @@ const Chat = ({ item }) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const text = formData.get('text');
-    const res = await apiRequest.post(`/messages/add`, {
-      text,
-      chatId: chat.id,
-    });
-    if (res.data.status === 'success') {
-      setChat(res.data);
+    try {
+      const res = await apiRequest.post(`/messages/add`, {
+        text,
+        chatId: chat.id,
+      });
+      if (res.data.status === 'success') {
+        const updatedChat = {
+          ...chat,
+          messages: [...chat.messages, res.data.data],
+        };
+        setChat(updatedChat);
+        if (refreshChatList) {
+          refreshChatList();
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      e.target.reset();
     }
-    console.log(res.data);
-    // setChat(res.data);
   };
   return (
     <div className='chat'>
@@ -41,6 +56,12 @@ const Chat = ({ item }) => {
               key={i.id}
               className='message'
               onClick={() => handleOpen(i.id)}
+              style={{
+                backgroundColor:
+                  i.seenBy.includes(currentUser.id) || chat?.id === i.id
+                    ? 'white'
+                    : '#fecd514e',
+              }}
             >
               <img
                 src={i.receiver[0].avatar || '/noavatar.png'}
@@ -56,27 +77,35 @@ const Chat = ({ item }) => {
           <div className='top'>
             <div className='user'>
               <img
-                src={chat.receiver[0].avatar || '/noavatar.png'}
-                alt={chat.receiver[0].username}
+                src={
+                  (chat.receiver && chat.receiver[0]?.avatar) || '/noavatar.png'
+                }
+                alt={(chat.receiver && chat.receiver[0]?.username) || 'User'}
               />
-              {chat.receiver[0].username}
+              {chat.receiver && chat.receiver[0]?.username}
             </div>
             <span className='close' onClick={() => setChat(null)}>
               X
             </span>
           </div>
           <div className='center'>
-            {chat.messages.map((message) => (
-              <div
-                key={message.id}
-                className={`chatMessage ${
-                  message.userId === currentUser.id ? 'own' : ''
-                }`}
-              >
-                <p>{message.text}</p>
-                <span>{new Date(message.createdAt).toLocaleTimeString()}</span>
-              </div>
-            ))}
+            {Array.isArray(chat.messages) && chat.messages.length > 0 ? (
+              chat.messages.map((message) => {
+                return (
+                  <div
+                    key={message.id}
+                    className={`chatMessage ${
+                      message.userId === currentUser.id ? 'own' : ''
+                    }`}
+                  >
+                    <p>{message.text}</p>
+                    <span>{format(message.createdAt)}</span>
+                  </div>
+                );
+              })
+            ) : (
+              <p>No messages</p> // Hiển thị khi không có tin nhắn
+            )}
           </div>
           <form onSubmit={handleSendChat} className='bottom'>
             <textarea name='text'></textarea>
