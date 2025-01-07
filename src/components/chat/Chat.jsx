@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import './chat.scss';
 import apiRequest from '../../lib/apiRequest';
@@ -8,12 +8,21 @@ import { format } from 'timeago.js';
 const Chat = ({ item, refreshChatList }) => {
   const { currentUser } = useContext(AuthContext);
   const [chat, setChat] = useState(null);
-  const [connection, setConnection] = useState(null); // Lưu trữ kết nối SignalR
+  const [connection, setConnection] = useState(null); // Store SignalR connection
+  const messagesEndRef = useRef(null);
 
-  // Kết nối với SignalR Hub
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chat]); // Run this whenever new messages are added
+
+  // Connect to SignalR Hub
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
-      .withUrl('http://localhost:5246/chathub') // Đảm bảo URL đúng
+      .withUrl('http://localhost:5246/chathub') // Ensure the correct URL
       .build();
 
     newConnection
@@ -24,10 +33,10 @@ const Chat = ({ item, refreshChatList }) => {
       })
       .catch((err) => console.error('Error while connecting: ', err));
 
-    // Lắng nghe sự kiện 'ReceiveMessage' để nhận tin nhắn
-    newConnection.on('ReceiveMessage', (user, message, timeSent) => {
-      console.log('Received time:', timeSent); // Kiểm tra thời gian nhận được từ backend
-
+    // Listen for 'ReceiveMessage' event to receive messages
+    newConnection.on('ReceiveMessage', (user, message, time) => {
+      // Convert the received UTC time to local time
+      console.log(time);
       setChat((prevChat) => {
         if (prevChat) {
           return {
@@ -36,7 +45,7 @@ const Chat = ({ item, refreshChatList }) => {
               ...prevChat.messages,
               {
                 text: message,
-                createdAt: timeSent,
+                createdAt: time, // Use the local time here
               },
             ],
           };
@@ -44,14 +53,18 @@ const Chat = ({ item, refreshChatList }) => {
         return prevChat;
       });
     });
+    connection.on('ReceiveMessage', (user, message, time) => {
+      console.log('Message received:', { user, message, time });
+    });
+
     return () => {
       if (newConnection) {
         newConnection.stop();
       }
     };
-  }, []);
+  }, []); // Only run on initial mount
 
-  // Mở cuộc trò chuyện
+  // Open chat and fetch data from API
   const handleOpen = async (id) => {
     try {
       const res = await apiRequest.get(`/chats/${id}`);
@@ -66,23 +79,22 @@ const Chat = ({ item, refreshChatList }) => {
     }
   };
 
-  // Gửi tin nhắn
+  // Send chat message
   const handleSendChat = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const text = formData.get('text');
-
     // Gửi tin nhắn qua SignalR
     if (connection && text.trim()) {
       try {
-        // Gửi tin nhắn real-time qua SignalR
+        // Gửi tin nhắn qua SignalR với thời gian
         await connection.invoke(
           'SendMessageAsync',
           currentUser.username,
           text.trim()
         );
 
-        // Gửi tin nhắn xuống database
+        // Lưu tin nhắn vào cơ sở dữ liệu
         const res = await apiRequest.post(`/messages/add`, {
           text,
           chatId: chat.id,
@@ -105,9 +117,10 @@ const Chat = ({ item, refreshChatList }) => {
       }
     }
   };
+
   return (
     <div className='chat'>
-      {/* Phần hiển thị danh sách tin nhắn */}
+      {/* Display chat list */}
       <div className='messages'>
         <h1>Messages</h1>
         {item &&
@@ -133,18 +146,16 @@ const Chat = ({ item, refreshChatList }) => {
           ))}
       </div>
 
-      {/* Phần chatbox */}
+      {/* Chatbox */}
       {chat && (
         <div className='chatBox'>
           <div className='top'>
             <div className='user'>
               <img
-                src={
-                  (chat.receiver && chat.receiver[0]?.avatar) || '/noavatar.png'
-                }
-                alt={(chat.receiver && chat.receiver[0]?.username) || 'User'}
+                src={chat.receiver?.[0]?.avatar || '/noavatar.png'}
+                alt={chat.receiver?.[0]?.username || 'User'}
               />
-              {chat.receiver && chat.receiver[0]?.username}
+              {chat.receiver?.[0]?.username}
             </div>
             <span className='close' onClick={() => setChat(null)}>
               X
@@ -166,6 +177,7 @@ const Chat = ({ item, refreshChatList }) => {
             ) : (
               <p>No messages</p>
             )}
+            <div ref={messagesEndRef} />
           </div>
           <form onSubmit={handleSendChat} className='bottom'>
             <textarea name='text'></textarea>
