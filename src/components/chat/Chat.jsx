@@ -4,13 +4,15 @@ import './chat.scss';
 import apiRequest from '../../lib/apiRequest';
 import { AuthContext } from '../../context/AuthContext';
 import { format } from 'timeago.js';
+import { useNotificationStore } from '../../lib/notificationStore';
+import * as signalR from '@microsoft/signalr';
 
 const Chat = ({ item, refreshChatList }) => {
   const { currentUser } = useContext(AuthContext);
   const [chat, setChat] = useState(null);
   const [connection, setConnection] = useState(null);
   const messagesEndRef = useRef(null);
-
+  const decrease = useNotificationStore((state) => state.decrease);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -23,7 +25,7 @@ const Chat = ({ item, refreshChatList }) => {
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
       .withUrl('http://localhost:5246/chathub')
-      .withAutomaticReconnect()
+      .withAutomaticReconnect([0, 2000, 10000]) // Retry sau 0ms, 2s, 10s
       .build();
 
     newConnection
@@ -32,8 +34,9 @@ const Chat = ({ item, refreshChatList }) => {
         console.log('Connected to SignalR Hub');
         setConnection(newConnection);
       })
-      .catch((err) => console.error('SignalR connection error:', err));
-
+      .catch((err) => {
+        console.error('SignalR connection error:', err);
+      });
     return () => {
       if (newConnection) {
         newConnection.stop();
@@ -71,6 +74,7 @@ const Chat = ({ item, refreshChatList }) => {
       setChat(res.data);
       const test = await apiRequest.put(`/chats/read/${id}`);
       console.log(test);
+      decrease();
       if (refreshChatList) {
         refreshChatList();
       }
@@ -163,7 +167,7 @@ const Chat = ({ item, refreshChatList }) => {
             {Array.isArray(chat.messages) && chat.messages.length > 0 ? (
               chat.messages.map((message) => (
                 <div
-                  key={message.id}
+                  key={message.id || `${message.text}-${message.createdAt}`}
                   className={`chatMessage ${
                     message.userId === currentUser.id ? 'own' : ''
                   }`}
