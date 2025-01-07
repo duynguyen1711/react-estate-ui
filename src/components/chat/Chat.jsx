@@ -8,7 +8,7 @@ import { format } from 'timeago.js';
 const Chat = ({ item, refreshChatList }) => {
   const { currentUser } = useContext(AuthContext);
   const [chat, setChat] = useState(null);
-  const [connection, setConnection] = useState(null); // Store SignalR connection
+  const [connection, setConnection] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -17,12 +17,13 @@ const Chat = ({ item, refreshChatList }) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [chat]); // Run this whenever new messages are added
+  }, [chat]);
 
   // Connect to SignalR Hub
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
-      .withUrl('http://localhost:5246/chathub') // Ensure the correct URL
+      .withUrl('http://localhost:5246/chathub')
+      .withAutomaticReconnect()
       .build();
 
     newConnection
@@ -31,38 +32,37 @@ const Chat = ({ item, refreshChatList }) => {
         console.log('Connected to SignalR Hub');
         setConnection(newConnection);
       })
-      .catch((err) => console.error('Error while connecting: ', err));
-
-    // Listen for 'ReceiveMessage' event to receive messages
-    newConnection.on('ReceiveMessage', (user, message, time) => {
-      // Convert the received UTC time to local time
-      console.log(time);
-      setChat((prevChat) => {
-        if (prevChat) {
-          return {
-            ...prevChat,
-            messages: [
-              ...prevChat.messages,
-              {
-                text: message,
-                createdAt: time, // Use the local time here
-              },
-            ],
-          };
-        }
-        return prevChat;
-      });
-    });
-    connection.on('ReceiveMessage', (user, message, time) => {
-      console.log('Message received:', { user, message, time });
-    });
+      .catch((err) => console.error('SignalR connection error:', err));
 
     return () => {
       if (newConnection) {
         newConnection.stop();
       }
     };
-  }, []); // Only run on initial mount
+  }, []);
+
+  useEffect(() => {
+    if (connection) {
+      connection.on('ReceiveMessage', (message, time) => {
+        console.log(time);
+        setChat((prevChat) => {
+          if (prevChat) {
+            return {
+              ...prevChat,
+              messages: [
+                ...prevChat.messages,
+                {
+                  text: message,
+                  createdAt: time,
+                },
+              ],
+            };
+          }
+          return prevChat;
+        });
+      });
+    }
+  }, [connection, currentUser.id]);
 
   // Open chat and fetch data from API
   const handleOpen = async (id) => {
@@ -83,37 +83,35 @@ const Chat = ({ item, refreshChatList }) => {
   const handleSendChat = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const text = formData.get('text');
-    // Gửi tin nhắn qua SignalR
-    if (connection && text.trim()) {
+    const text = formData.get('text').trim();
+
+    if (connection && text && chat) {
       try {
-        // Gửi tin nhắn qua SignalR với thời gian
-        await connection.invoke(
-          'SendMessageAsync',
-          currentUser.username,
-          text.trim()
-        );
+        // Check if `userIDs` exists
+        if (chat.userIDs) {
+          const receiverId = chat.userIDs.find((id) => id !== currentUser.id);
 
-        // Lưu tin nhắn vào cơ sở dữ liệu
-        const res = await apiRequest.post(`/messages/add`, {
-          text,
-          chatId: chat.id,
-        });
+          if (receiverId) {
+            // Send message via SignalR
+            await connection.invoke('SendMessageAsync', chat.id, text);
 
-        if (res.data.status === 'success') {
-          const updatedChat = {
-            ...chat,
-            messages: [...chat.messages, res.data.data],
-          };
-          setChat(updatedChat);
-          if (refreshChatList) {
-            refreshChatList();
+            // Update UI immediately only if the message is sent
+            setChat((prevChat) => ({
+              ...prevChat,
+              messages: [
+                ...prevChat.messages,
+                {
+                  text,
+                  userId: currentUser.id,
+                },
+              ],
+            }));
           }
         }
       } catch (err) {
-        console.error('Error sending message: ', err);
+        console.error('Error sending message:', err);
       } finally {
-        e.target.reset(); // Reset form
+        e.target.reset();
       }
     }
   };
